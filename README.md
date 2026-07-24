@@ -2,6 +2,8 @@
 
 **NewsLens AI** is a Multi-Agent AI-powered news analysis system built using **LangChain, Gemini, ChromaDB, Retrieval-Augmented Generation (RAG), and Streamlit**. The application helps users analyze news articles by generating concise summaries, detecting media bias, verifying factual consistency using retrieved knowledge, and performing safety analysis.
 
+## 🚀 Live Demo
+newslens-ai-production.up.railway.app
 ---
 
 # 🚀 Features

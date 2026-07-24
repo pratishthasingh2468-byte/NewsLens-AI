@@ -16,9 +16,6 @@ venv/
 # Streamlit Cache
 .streamlit/
 
-# Chroma Database (optional)
-data/embeddings/
-
 # OS files
 .DS_Store
 Thumbs.db

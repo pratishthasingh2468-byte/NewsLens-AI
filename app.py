@@ -6,176 +6,185 @@ from agents.bias_agent import detect_bias
 from agents.verifier import verify_news
 from agents.safety import safety_check
 
-# ---------------------------------------------------
-# Page Config
-# ---------------------------------------------------
-
 st.set_page_config(
     page_title="NewsLens AI",
     page_icon="📰",
     layout="wide",
 )
 
-# ---------------------------------------------------
-# Custom CSS
-# ---------------------------------------------------
-
+# ---------- Minimal visual styling ----------
 st.markdown("""
 <style>
+    .stApp {
+        background: #f5f7fb;
+    }
 
-.stApp{
-    background-color:#FFEFD5;
-}
+    .block-container {
+        max-width: 1150px;
+        padding-top: 2.2rem;
+        padding-bottom: 3rem;
+    }
 
-.main-title{
-    font-size:42px;
-    font-weight:700;
-    color:#222;
-}
+    .main-title {
+        font-size: 2.4rem;
+        font-weight: 750;
+        color: #172554;
+        margin-bottom: 0.2rem;
+    }
 
-.subtitle{
-    color:#555;
-    font-size:18px;
-    margin-bottom:20px;
-}
+    .subtitle {
+        color: #64748b;
+        font-size: 1rem;
+        margin-bottom: 1.8rem;
+    }
 
-.block{
-    background:white;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0px 3px 8px rgba(0,0,0,0.08);
-}
+    .input-heading {
+        color: #1e293b;
+        font-size: 1.1rem;
+        font-weight: 650;
+        margin-bottom: 0.5rem;
+    }
 
-textarea{
-    font-size:16px !important;
-}
+    div[data-testid="stTextArea"] textarea {
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        background: #ffffff;
+        font-size: 15px;
+    }
 
+    div.stButton > button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font-weight: 600;
+        padding: 0.65rem 1rem;
+    }
+
+    div.stButton > button:hover {
+        background: #1d4ed8;
+        color: white;
+        border: none;
+    }
+
+    div[data-testid="stTabs"] button {
+        font-weight: 600;
+    }
+
+    .result-heading {
+        color: #1e3a8a;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.7rem;
+    }
+
+    .footer {
+        color: #94a3b8;
+        text-align: center;
+        font-size: 0.85rem;
+        margin-top: 2.5rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------
-# Header
-# ---------------------------------------------------
 
+# ---------- Header ----------
 st.markdown(
     "<div class='main-title'>📰 NewsLens AI</div>",
     unsafe_allow_html=True,
 )
 
 st.markdown(
-    "<div class='subtitle'>Multi-Agent News Analysis using Gemini + RAG</div>",
+    "<div class='subtitle'>AI-powered news analysis using Gemini and Retrieval-Augmented Generation (RAG)</div>",
     unsafe_allow_html=True,
 )
 
-# ---------------------------------------------------
-# Input
-# ---------------------------------------------------
+st.divider()
 
-news_article = st.text_area(
-    "Paste a News Article",
-    height=280,
-    placeholder="Paste your article here..."
+
+# ---------- Article input ----------
+st.markdown(
+    "<div class='input-heading'>Paste your news article</div>",
+    unsafe_allow_html=True,
 )
 
-# ---------------------------------------------------
-# Button
-# ---------------------------------------------------
+news_article = st.text_area(
+    "News article",
+    height=260,
+    placeholder="Paste the complete news article here...",
+    label_visibility="collapsed",
+)
 
-if st.button("🚀 Analyze News", use_container_width=True):
+analyze = st.button(
+    "🚀 Analyze News",
+    use_container_width=True,
+)
+
+
+# ---------- Analysis ----------
+if analyze:
 
     if not news_article.strip():
-        st.warning("Please paste a news article.")
+        st.warning("Please paste a news article before starting the analysis.")
         st.stop()
 
-    # ----------------------------------------
-    # Retrieve Context
-    # ----------------------------------------
-
     with st.spinner("Retrieving relevant documents..."):
-
         context = retrieve_context(news_article)
 
-    # ----------------------------------------
-    # Summary
-    # ----------------------------------------
+    with st.spinner("Generating article summary..."):
+        summary = summarize_news(news_article, context)
 
-    with st.spinner("Generating summary..."):
+    with st.spinner("Analyzing possible bias..."):
+        bias = detect_bias(news_article)
 
-        summary = summarize_news(
-            news_article,
-            context
-        )
+    with st.spinner("Verifying article claims..."):
+        verification = verify_news(news_article, context)
 
-    # ----------------------------------------
-    # Bias
-    # ----------------------------------------
+    with st.spinner("Checking content safety..."):
+        safety = safety_check(news_article)
 
-    with st.spinner("Analyzing bias..."):
-
-        bias = detect_bias(
-            news_article
-        )
-
-    # ----------------------------------------
-    # Verification
-    # ----------------------------------------
-
-    with st.spinner("Verifying facts..."):
-
-        verification = verify_news(
-            news_article,
-            context
-        )
-
-    # ----------------------------------------
-    # Safety
-    # ----------------------------------------
-
-    with st.spinner("Checking safety..."):
-
-        safety = safety_check(
-            news_article
-        )
-
-    # ------------------------------------------------
-
-    st.success("Analysis Complete!")
+    st.success("News analysis completed successfully!")
 
     st.divider()
 
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "📝 Summary",
-        "⚖ Bias",
+        "⚖️ Bias Analysis",
         "✅ Verification",
-        "🛡 Safety",
-        "📚 Retrieved Context"
+        "🛡️ Safety",
+        "📚 Retrieved Context",
     ])
 
     with tab1:
-
-        st.markdown("### Summary")
+        st.markdown("<div class='result-heading'>Article Summary</div>",
+                    unsafe_allow_html=True)
         st.write(summary)
 
     with tab2:
-
-        st.markdown("### Bias Analysis")
+        st.markdown("<div class='result-heading'>Bias Analysis</div>",
+                    unsafe_allow_html=True)
         st.write(bias)
 
     with tab3:
-
-        st.markdown("### Fact Verification")
+        st.markdown("<div class='result-heading'>Fact Verification</div>",
+                    unsafe_allow_html=True)
         st.write(verification)
 
     with tab4:
-
-        st.markdown("### Safety Analysis")
+        st.markdown("<div class='result-heading'>Safety Analysis</div>",
+                    unsafe_allow_html=True)
         st.write(safety)
 
     with tab5:
-
-        st.markdown("### Retrieved Documents")
+        st.markdown("<div class='result-heading'>Retrieved Documents</div>",
+                    unsafe_allow_html=True)
 
         if context:
             st.write(context)
         else:
-            st.info("No relevant documents retrieved.")
+            st.info("No relevant documents were retrieved.")
+
+st.markdown(
+    "<div class='footer'>NewsLens AI · Multi-Agent News Analysis</div>",
+    unsafe_allow_html=True,
+)
